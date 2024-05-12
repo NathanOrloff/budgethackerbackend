@@ -9,7 +9,7 @@ class Budget:
     SCHEMA = Schema({
         'version': And(Use(int)),
         'info': {
-            'budget': And(Use(list))
+            'budget': And(Use(dict))
         }
     })
 
