@@ -8,10 +8,11 @@ from constructs import Construct
 class CognitoStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
-        super().__init__(scope, construct_id, **kwargs)
+        super().__init__(scope, construct_id)
+        self.stage = kwargs.get('stage', 'alpha')
 
-        userpool = cognito.UserPool(self, "TestUserPool", 
-            user_pool_name='test-user-pool',
+        userpool = cognito.UserPool(self, f"budgethacker-userpool-{self.stage}", 
+            user_pool_name=f'budgethacker-{self.stage}-user-pool',
             sign_in_aliases={
                 'username': True,
                 'email': True
@@ -29,7 +30,7 @@ class CognitoStack(Stack):
             removal_policy=RemovalPolicy.DESTROY,
         )
 
-        client = userpool.add_client("TestClient",
+        client = userpool.add_client(f"budgerhacker-client-{self.stage}",
             o_auth=cognito.OAuthSettings(
                 flows=cognito.OAuthFlows(
                     implicit_code_grant=True
@@ -46,9 +47,9 @@ class CognitoStack(Stack):
             )
         )
 
-        domain = userpool.add_domain("TestDomain", 
+        domain = userpool.add_domain(f"budgethacker-domain-{self.stage}", 
             cognito_domain={
-                'domain_prefix': "testcogappnorloff"
+                'domain_prefix': "budgethacker"
             }                                     
         )
         sign_in_url = domain.sign_in_url(client,
